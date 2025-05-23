@@ -6,7 +6,7 @@ Router for grammar checking endpoints using LanguageTool.
 from fastapi import APIRouter, HTTPException
 import requests
 from app.models.grammar import GrammarRequest
-from app.config import LANGUAGETOOL_API  # <-- Import here
+from app.config import LANGUAGETOOL_API
 
 router = APIRouter()
 
