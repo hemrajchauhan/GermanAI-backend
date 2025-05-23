@@ -3,5 +3,5 @@ from typing import Optional
 
 class TranslateRequest(BaseModel):
     word: str
-    part_of_speech: Optional[str] = None
-    language: Optional[str] = "de"
+    source_language: Optional[str] = "de"   # Default German
+    target_language: Optional[str] = "en"   # Default English

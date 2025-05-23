@@ -3,25 +3,20 @@ grammar.py
 Router for grammar checking endpoints using LanguageTool.
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 import requests
 from app.models.grammar import GrammarRequest
-from fastapi import HTTPException
+from app.config import LANGUAGETOOL_API
 
 router = APIRouter()
 
-LANGUAGETOOL_API = "https://api.languagetool.org/v2/check"
-
 @router.post("/check-grammar")
 async def check_grammar(request: GrammarRequest):
-    """
-    Checks the grammar of the provided German text using LanguageTool.
-    """
     try:
         payload = {"text": request.text, "language": "de-DE"}
         response = requests.post(LANGUAGETOOL_API, data=payload, timeout=10)
         response.raise_for_status()
         return response.json()
-    except requests.RequestException as e:
+    except requests.RequestException:
         raise HTTPException(status_code=502, detail="LanguageTool service unavailable.")
 
