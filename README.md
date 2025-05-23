@@ -16,6 +16,16 @@ Built with FastAPI and Docker Compose, it’s easy to run locally or in the clou
 
 ---
 
+## Live Demo
+The API is deployed and available at:
+
+- [https://germanai-backend.fly.dev/](https://germanai-backend.fly.dev/)
+- [Interactive Swagger UI Docs](https://germanai-backend.fly.dev/docs)
+
+> Note: The root URL (`/`) returns `{"message":"Welcome to GermanAI-backend! Visit /docs for API documentation."}` by design. Use `/docs` or the listed endpoints for API access.
+
+---
+
 ## Quick Start
 
 1. **Clone the repository**
