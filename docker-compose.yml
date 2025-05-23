@@ -6,6 +6,9 @@ services:
       - "8080:8080"
     depends_on:
       - languagetool
+    environment:
+      - ALLOWED_ORIGINS=https://germanai-backend.fly.dev              # Production
+     # - ALLOWED_ORIGINS=http://localhost:8080,http://10.0.2.2:8080  # Development
   languagetool:
     image: silviof/docker-languagetool
     ports:
