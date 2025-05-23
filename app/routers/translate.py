@@ -1,20 +1,41 @@
 from fastapi import APIRouter
-import json
-from pathlib import Path
 from app.models.translate import TranslateRequest
+from app.config import TRANSLATE_API
+import requests
 
 router = APIRouter()
 
-DICT_PATH = Path(__file__).parent.parent / "static" / "dictionary.json"
-
-with open(DICT_PATH, encoding="utf-8") as f:
-    DICTIONARY = json.load(f)
-
 @router.post("/translate-word")
 async def translate_word(request: TranslateRequest):
-    word = request.word.lower()
-    entry = DICTIONARY.get(word)
-    if entry:
-        # For future: filter by part_of_speech, etc.
-        return entry
-    return {"error": "Word not found"}
+    """
+    Translates a word using LibreTranslate.
+    """
+    try:
+        payload = {
+            "q": request.word,
+            "source": request.source_language or "de",
+            "target": request.target_language or "en",
+            "format": "text"
+        }
+        response = requests.post(TRANSLATE_API, data=payload, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return {
+            "word": request.word,
+            "translation": data.get("translatedText"),
+            "source_language": payload["source"],
+            "target_language": payload["target"],
+            "source": "libretranslate"
+        }
+    except requests.RequestException:
+        return {"error": "LibreTranslate service unavailable"}
+
+@router.get("/translate-languages")
+async def translate_languages():
+    api_url = TRANSLATE_API.rsplit("/", 1)[0] + "/languages"
+    try:
+        response = requests.get(api_url, timeout=10)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException:
+        return {"error": "LibreTranslate service unavailable"}
