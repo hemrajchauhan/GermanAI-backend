@@ -8,29 +8,27 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Build Docker Compose services
-      run: |
-        docker compose build
+      - name: Build Docker Compose services
+        run: |
+          docker compose build
 
-    # Optionally, run tests for future
-    # - name: Run tests
-    #   run: |
-    #     docker compose up -d
-    #     sleep 15  # Wait for containers to initialize
-    #     # Insert test commands here (e.g. pytest)
-    #     docker compose down
+      # Optionally, add tests in the future:
+      # - name: Run tests
+      #   run: |
+      #     docker compose up -d
+      #     sleep 15
+      #     # pytest or other test commands
+      #     docker compose down
