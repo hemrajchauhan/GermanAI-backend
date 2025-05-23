@@ -1,0 +1,13 @@
+{
+  "hund": {
+    "type": "noun",
+    "gender": "der",
+    "translation": "dog",
+    "examples": ["Der Hund läuft im Park."]
+  },
+  "laufen": {
+    "type": "verb",
+    "translation": "to run",
+    "examples": ["Ich laufe jeden Morgen."]
+  }
+}

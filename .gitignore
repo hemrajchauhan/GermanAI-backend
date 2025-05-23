@@ -1,0 +1,21 @@
+cat > .gitignore << EOF
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Docker
+*.env
+.env
+*.log
+
+# VSCode or JetBrains IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+
+# Test/output files
+*.sqlite3
+EOF
