@@ -10,7 +10,7 @@ from fastapi import HTTPException
 
 router = APIRouter()
 
-LANGUAGETOOL_API = "http://languagetool:8010/v2/check"
+LANGUAGETOOL_API = "https://api.languagetool.org/v2/check"
 
 @router.post("/check-grammar")
 async def check_grammar(request: GrammarRequest):
