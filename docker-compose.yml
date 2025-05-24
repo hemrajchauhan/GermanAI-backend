@@ -1,30 +1,50 @@
-version: "3.8"
 services:
-  fastapi:
+  backend:
     build: .
+    container_name: germanai-backend
     ports:
-      - "8080:8080"  # Access FastAPI at http://localhost:8080
+      - "8080:8080"
+    environment:
+      LANGUAGETOOL_API: http://languagetool:8010/v2/check
+      TRANSLATE_API: http://libretranslate:5000/translate
+      ALLOWED_ORIGINS: "http://localhost:8080,http://10.0.2.2:8080"
+      # Keycloak integration variables:
+      KEYCLOAK_URL: http://localhost:8082
+      KEYCLOAK_REALM: GermanAI
+      KEYCLOAK_CLIENT_ID: vokabelmeister-app
+      # KEYCLOAK_CLIENT_SECRET: your_secret_if_needed
     depends_on:
       - languagetool
       - libretranslate
-    environment:
-      - ALLOWED_ORIGINS=http://localhost:8080,http://10.0.2.2:8080
-      - LANGUAGETOOL_API=http://languagetool:8010/v2/check
-      - TRANSLATE_API=http://libretranslate:5000/translate
-    volumes:
-      - .:/app       # Optional: enables live code reload if using uvicorn --reload
+      - keycloak
+    restart: unless-stopped
 
   languagetool:
-    image: silviof/docker-languagetool
+    image: silviof/docker-languagetool:latest
+    container_name: languagetool
     ports:
-      - "8081:8010"  # Host 8081 -> container 8010 (for browser testing)
+      - "8081:8010" # Host 8081 -> container 8010 (for browser testing)
     environment:
-      - JAVA_OPTS=-Xmx1g
+      - JAVA_OPTS=-Xmx2g
       - LANGUAGETOOL_PORT=8010
+    restart: unless-stopped
 
   libretranslate:
     image: libretranslate/libretranslate
+    container_name: libretranslate
     ports:
-      - "5000:5000"  # Host 5000 -> container 5000 (for browser/API testing)
+      - "5000:5000" # Host 5000 -> container 5000 (for browser/API testing)
     environment:
       - LT_HOST=0.0.0.0
+    restart: unless-stopped
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.2
+    container_name: keycloak
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=adminpassword123
+    ports:
+      - "8082:8080" # Host 8082 -> container 8080 (for browser/API testing)
+    restart: unless-stopped
