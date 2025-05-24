@@ -23,7 +23,7 @@ services:
     image: silviof/docker-languagetool:latest
     container_name: languagetool
     ports:
-      - "8081:8010"
+      - "8081:8010" # Host 8081 -> container 8010 (for browser testing)
     environment:
       - JAVA_OPTS=-Xmx2g
       - LANGUAGETOOL_PORT=8010
@@ -33,7 +33,7 @@ services:
     image: libretranslate/libretranslate
     container_name: libretranslate
     ports:
-      - "5000:5000"
+      - "5000:5000" # Host 5000 -> container 5000 (for browser/API testing)
     environment:
       - LT_HOST=0.0.0.0
     restart: unless-stopped
@@ -46,5 +46,5 @@ services:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=adminpassword123
     ports:
-      - "8082:8080"
+      - "8082:8080" # Host 8082 -> container 8080 (for browser/API testing)
     restart: unless-stopped
