@@ -1,12 +1,13 @@
 import requests
 import random
 import json
-from app.config import OLLAMA_URL
+from app.config import OLLAMA_URL, OLLAMA_MODEL
 
-def generate_sentence(word: str, model: str = "llama3") -> str:
+def generate_sentence(word: str, model: str = None) -> str:
     """
     Generate a German example sentence with the provided word.
     """
+    model = model or OLLAMA_MODEL
     prompt = f"Erzeuge einen deutschen Beispielsatz mit dem Wort '{word}'."
     payload = {
         "model": model,
@@ -26,10 +27,11 @@ def generate_sentence(word: str, model: str = "llama3") -> str:
     except Exception as e:
         return f"An unexpected error occurred: {str(e)}"
 
-def get_verb_form(verb: str, form: str, person: str = "ich", model: str = "llama3") -> str:
+def get_verb_form(verb: str, form: str, person: str = "ich", model: str = None) -> str:
     """
     Generate a specific verb form for a given German verb and person.
     """
+    model = model or OLLAMA_MODEL
     prompts = {
         "infinitiv": f"Gib die Infinitivform des Verbs '{verb}'.",
         "praesens": f"Konjugiere das Verb '{verb}' im Präsens für '{person}'.",
@@ -66,11 +68,12 @@ def get_verb_form(verb: str, form: str, person: str = "ich", model: str = "llama
     except Exception as e:
         return f"An unexpected error occurred: {str(e)}"
 
-def generate_mcq_meaning(word: str, model: str = "llama3") -> dict:
+def generate_mcq_meaning(word: str, model: str = None) -> dict:
     """
     Generates a multiple-choice question (MCQ) for the meaning of a German word (verb, noun, etc.).
     Returns a dict with the options (shuffled) and the index of the correct answer.
     """
+    model = model or OLLAMA_MODEL
     prompt = (
     f"Erstelle eine Multiple-Choice-Frage für das deutsche Wort '{word}'. "
     f"Gib vier Antwortmöglichkeiten auf Englisch für die Bedeutung dieses Wortes an. "
@@ -131,7 +134,11 @@ def generate_mcq_meaning(word: str, model: str = "llama3") -> dict:
         return {"error": f"An unexpected error occurred: {str(e)}"}
     
 
-def translate_word_all_meanings(word: str, model: str = "llama3") -> dict:
+def translate_word_all_meanings(word: str, model: str = None) -> dict:
+    """
+    Get all possible English meanings of a German word.
+    """
+    model = model or OLLAMA_MODEL
     prompt = (
         f"List all possible English meanings for the German word '{word}'. "
         "Respond as a JSON array of strings, with no extra explanation."
@@ -167,7 +174,11 @@ def translate_word_all_meanings(word: str, model: str = "llama3") -> dict:
         return {"error": f"An unexpected error occurred: {str(e)}"}
     
 
-def translate_sentence(sentence: str, model: str = "llama3", max_words: int = 20) -> dict:
+def translate_sentence(sentence: str, model: str = None, max_words: int = 50) -> dict:
+    """
+    Translate a German sentence to English (with a word limit for resource control).
+    """
+    model = model or OLLAMA_MODEL
     if not sentence or not sentence.strip():
         return {"error": "No sentence provided."}
     if len(sentence.split()) > max_words:
