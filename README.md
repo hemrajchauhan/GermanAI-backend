@@ -45,6 +45,7 @@ It provides grammar checking, smart translation, verb conjugation, example sente
     
     # Ollama LLM endpoint (internal Docker address)
     OLLAMA_URL=http://ollama:11434/api/generate
+    OLLAMA_MODEL=llama3
     
     # LanguageTool API (internal Docker address)
     LANGUAGETOOL_API=http://languagetool:8010/v2/check
@@ -55,6 +56,7 @@ It provides grammar checking, smart translation, verb conjugation, example sente
     # CORS
     ALLOWED_ORIGINS=http://localhost:8080
     ```
+    **Note:** Choose `OLLAMA_MODEL` based on your server resources. Default = `llama3` in `config.py`
 
 4. **Build and run with Docker Compose**
 

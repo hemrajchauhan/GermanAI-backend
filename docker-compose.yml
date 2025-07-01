@@ -54,7 +54,7 @@ services:
   # Ollama model pull init service: pulls llama3 once at startup
   ollama-init:
     image: ollama/ollama
-    command: pull llama3
+    command: pull ${OLLAMA_MODEL}
     volumes:
       - ollama_data:/root/.ollama
 
