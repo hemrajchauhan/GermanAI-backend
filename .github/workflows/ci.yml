@@ -9,14 +9,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      # Uncomment if you add Python-based tests later
+      # - name: Set up Python
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: "3.11"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -28,7 +33,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image to GHCR
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -37,7 +42,7 @@ jobs:
             ghcr.io/hemrajchauhan/germanai-backend:latest
             ghcr.io/hemrajchauhan/germanai-backend:${{ github.ref_name }}
 
-      # Uncomment and customize this block for integration tests!
+      # Uncomment and customize for tests!
       # - name: Run tests
       #   run: |
       #     docker compose up -d
