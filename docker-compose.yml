@@ -43,7 +43,7 @@ services:
     image: libretranslate/libretranslate
     container_name: libretranslate
     ports:
-      - "5000:5000"
+      - "5000:5000" # Host 5000 -> container 5000 (for browser/API testing)
     environment:
       - LT_HOST=0.0.0.0
     restart: unless-stopped
@@ -56,7 +56,7 @@ services:
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
     ports:
-      - "8082:8080"
+      - "8082:8080" # Host 8082 -> container 8080 (for browser/API testing)
     volumes:
       - keycloak_data:/opt/keycloak/data  # This is important!
     restart: unless-stopped
@@ -72,7 +72,7 @@ services:
     image: ollama/ollama
     container_name: ollama
     ports:
-      - "11434:11434"
+      - "11434:11434" # Host 11434 -> container 11434 (for browser/API testing)
     volumes:
       - ollama_data:/root/.ollama
     command: serve
