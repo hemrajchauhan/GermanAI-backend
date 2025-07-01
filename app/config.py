@@ -2,7 +2,6 @@ import os
 
 # Declare this in .env file
 LANGUAGETOOL_API = os.getenv("LANGUAGETOOL_API")
-TRANSLATE_API = os.getenv("TRANSLATE_API")
 OLLAMA_URL = os.environ.get("OLLAMA_URL")
 KEYCLOAK_URL_INTERNAL = os.getenv("KEYCLOAK_URL_INTERNAL")
 KEYCLOAK_URL_PUBLIC = os.getenv("KEYCLOAK_URL_PUBLIC")

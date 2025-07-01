@@ -1,44 +1,29 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 from app.auth.keycloak import verify_jwt_token
-from app.models.translate import TranslateRequest
-from app.config import TRANSLATE_API
-import requests
+from app.models.llm import TranslateWordResponse, TranslateSentenceResponse, TranslateSentenceRequest
+from app.services.llm_service import translate_word_all_meanings, translate_sentence
 
 router = APIRouter(
     dependencies=[Depends(verify_jwt_token)]
 )
 
-@router.post("/translate-word")
-async def translate_word(request: TranslateRequest):
-    """
-    Translates a word using LibreTranslate.
-    """
-    try:
-        payload = {
-            "q": request.word,
-            "source": request.source_language or "de",
-            "target": request.target_language or "en",
-            "format": "text"
-        }
-        response = requests.post(TRANSLATE_API, data=payload, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        return {
-            "word": request.word,
-            "translation": data.get("translatedText"),
-            "source_language": payload["source"],
-            "target_language": payload["target"],
-            "source": "libretranslate"
-        }
-    except requests.RequestException:
-        return {"error": "LibreTranslate service unavailable"}
+@router.get("/translate-word/", response_model=TranslateWordResponse)
+def translate_word_endpoint(word: str = Query(..., description="German word to translate")):
+    result = translate_word_all_meanings(word)
+    if "error" in result:
+        # 502 = bad upstream, 400 = user input error
+        raise HTTPException(status_code=502, detail=result["error"])
+    if not result.get("meanings"):
+        raise HTTPException(status_code=404, detail="No meanings found.")
+    return result
 
-@router.get("/translate-languages")
-async def translate_languages():
-    api_url = TRANSLATE_API.rsplit("/", 1)[0] + "/languages"
-    try:
-        response = requests.get(api_url, timeout=10)
-        response.raise_for_status()
-        return response.json()
-    except requests.RequestException:
-        return {"error": "LibreTranslate service unavailable"}
+
+@router.post("/translate-sentence/", response_model=TranslateSentenceResponse)
+def translate_sentence_endpoint(request: TranslateSentenceRequest):
+    result = translate_sentence(request.sentence)
+    if "error" in result:
+        if "long" in result["error"]:
+            raise HTTPException(status_code=400, detail=result["error"])
+        else:
+            raise HTTPException(status_code=502, detail=result["error"])
+    return result

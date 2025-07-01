@@ -9,7 +9,10 @@ from app.config import (
     KEYCLOAK_CLIENT_ID,
 )
 
-OIDC_CONFIG = f"{KEYCLOAK_URL_INTERNAL}/realms/{KEYCLOAK_REALM}/.well-known/openid-configuration"
+# Use internal for backend-to-keycloak, or fallback to public
+KEYCLOAK_URL_BACKEND = KEYCLOAK_URL_INTERNAL or KEYCLOAK_URL_PUBLIC
+
+OIDC_CONFIG = f"{KEYCLOAK_URL_BACKEND}/realms/{KEYCLOAK_REALM}/.well-known/openid-configuration"
 JWKS_URL = ""
 ALGORITHMS = ["RS256"]
 TOKEN_URL = f"{KEYCLOAK_URL_PUBLIC}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/token"
