@@ -1,5 +1,6 @@
 import requests
 import random
+import json
 from app.config import OLLAMA_URL
 
 def generate_sentence(word: str, model: str = "llama3") -> str:
@@ -126,5 +127,73 @@ def generate_mcq_meaning(word: str, model: str = "llama3") -> dict:
         return {"error": "Error: Could not connect to the LLM service (Ollama)."}
     except requests.exceptions.Timeout:
         return {"error": "Error: The request to the LLM service timed out."}
+    except Exception as e:
+        return {"error": f"An unexpected error occurred: {str(e)}"}
+    
+
+def translate_word_all_meanings(word: str, model: str = "llama3") -> dict:
+    prompt = (
+        f"List all possible English meanings for the German word '{word}'. "
+        "Respond as a JSON array of strings, with no extra explanation."
+    )
+    payload = {
+        "model": model,
+        "prompt": prompt,
+        "stream": False,
+        "options": {"num_predict": 80}
+    }
+    try:
+        response = requests.post(OLLAMA_URL, json=payload, timeout=60)
+        response.raise_for_status()
+        data = response.json()
+        meanings_text = data.get("response", "").strip()
+        # Try to parse JSON array first
+        try:
+            meanings = json.loads(meanings_text)
+            if not isinstance(meanings, list) or not meanings:
+                raise ValueError
+        except Exception:
+            # fallback: try to split by lines/bullets if not JSON
+            lines = [m.strip("-•;:. ") for m in meanings_text.splitlines() if m.strip()]
+            meanings = [l for l in lines if l and len(l) < 128]
+        if not meanings:
+            return {"error": "No meanings found in the LLM response."}
+        return {"word": word, "meanings": meanings}
+    except requests.exceptions.ConnectionError:
+        return {"error": "Could not connect to the LLM service (Ollama)."}
+    except requests.exceptions.Timeout:
+        return {"error": "The request to the LLM service timed out."}
+    except Exception as e:
+        return {"error": f"An unexpected error occurred: {str(e)}"}
+    
+
+def translate_sentence(sentence: str, model: str = "llama3", max_words: int = 20) -> dict:
+    if not sentence or not sentence.strip():
+        return {"error": "No sentence provided."}
+    if len(sentence.split()) > max_words:
+        return {"error": f"Sentence too long (max {max_words} words)."}
+
+    prompt = (
+        f"Translate the following German sentence into English:\n\n{sentence}\n\n"
+        "Only return the English translation, no extra explanation."
+    )
+    payload = {
+        "model": model,
+        "prompt": prompt,
+        "stream": False,
+        "options": {"num_predict": 150}
+    }
+    try:
+        response = requests.post(OLLAMA_URL, json=payload, timeout=60)
+        response.raise_for_status()
+        data = response.json()
+        translation = data.get("response", "").strip()
+        if not translation:
+            return {"error": "No translation found in the LLM response."}
+        return {"sentence": sentence, "translation": translation}
+    except requests.exceptions.ConnectionError:
+        return {"error": "Could not connect to the LLM service (Ollama)."}
+    except requests.exceptions.Timeout:
+        return {"error": "The request to the LLM service timed out."}
     except Exception as e:
         return {"error": f"An unexpected error occurred: {str(e)}"}

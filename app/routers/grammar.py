@@ -3,6 +3,7 @@ import requests
 from app.auth.keycloak import verify_jwt_token
 from app.models.grammar import GrammarRequest
 from app.config import LANGUAGETOOL_API
+from app.models.llm import ExampleSentenceResponse, VerbFormResponse, MCQMeaningResponse
 from app.models.verb_form_enum import VerbForm
 from app.models.person_enum import Person
 from app.services.llm_service import generate_sentence, get_verb_form, generate_mcq_meaning
@@ -22,13 +23,11 @@ async def check_grammar(request: GrammarRequest):
         raise HTTPException(status_code=502, detail="LanguageTool service unavailable.")
 
 
-@router.get("/example-sentence/")
+@router.get("/example-sentence/", response_model=ExampleSentenceResponse)
 def example_sentence(
     word: str = Query(..., description="Word to use in the German example sentence")
 ):
     result = generate_sentence(word)
-
-    # Error handling for generate_sentence
     if result.startswith("Error: Could not connect to the LLM service"):
         raise HTTPException(status_code=503, detail=result)
     if result.startswith("Error: The request to the LLM service timed out."):
@@ -37,20 +36,15 @@ def example_sentence(
         raise HTTPException(status_code=502, detail=result)
     if result.startswith("An unexpected error occurred"):
         raise HTTPException(status_code=500, detail=result)
+    return ExampleSentenceResponse(word=word, sentence=result)
 
-    # Normal case
-    return {"word": word, "sentence": result}
-
-
-@router.get("/verb-form/")
+@router.get("/verb-form/", response_model=VerbFormResponse)
 def verb_form(
     verb: str = Query(..., description="German verb in any form (e.g., gehen)"),
     form: VerbForm = Query(..., description="Verb form"),
     person: Person = Query(Person.ich, description="Person for conjugation (ich, du, er/sie/es, wir, ihr, sie/Sie)")
 ):
     result = get_verb_form(verb, form.value, person.value)
-
-    # Error handling for get_verb_form
     if result.startswith("Unknown or unsupported verb form."):
         raise HTTPException(status_code=400, detail=result)
     if result.startswith("Error: Could not connect to the LLM service"):
@@ -61,12 +55,9 @@ def verb_form(
         raise HTTPException(status_code=502, detail=result)
     if result.startswith("An unexpected error occurred"):
         raise HTTPException(status_code=500, detail=result)
+    return VerbFormResponse(verb=verb, form=form.value, person=person.value, result=result)
 
-    # Normal case
-    return {"verb": verb, "form": form.value, "person": person.value, "result": result}
-
-
-@router.get("/mcq-meaning/")
+@router.get("/mcq-meaning/", response_model=MCQMeaningResponse)
 def mcq_meaning(
     word: str = Query(..., description="German word (noun, verb, adjective, etc.)")
 ):
@@ -78,4 +69,8 @@ def mcq_meaning(
             status_code=502,
             detail="Could not generate multiple choice options. Try another word or rephrase your prompt."
         )
-    return result
+    return MCQMeaningResponse(
+        word=result["word"],
+        options=result["options"],
+        answer=result["answer"]
+    )
