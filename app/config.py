@@ -1,10 +1,14 @@
-# app/config.py
-
 import os
 
-LANGUAGETOOL_API = os.getenv("LANGUAGETOOL_API", "http://languagetool:8010/v2/check")
-TRANSLATE_API = os.getenv("TRANSLATE_API", "http://libretranslate:5000/translate")
-KEYCLOAK_URL = os.getenv("KEYCLOAK_URL", "http://localhost:8082")
-KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM", "GermanAI")
-KEYCLOAK_CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID", "vokabelmeister-app")
-# KEYCLOAK_CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET", "")
+# Declare this in .env file
+LANGUAGETOOL_API = os.getenv("LANGUAGETOOL_API")
+TRANSLATE_API = os.getenv("TRANSLATE_API")
+KEYCLOAK_URL_INTERNAL = os.getenv("KEYCLOAK_URL_INTERNAL")
+KEYCLOAK_URL_PUBLIC = os.getenv("KEYCLOAK_URL_PUBLIC")
+KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM")
+KEYCLOAK_CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID")
+KEYCLOAK_CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
+# KEYCLOAK_ADMIN_CLIENT_SECRET = os.getenv("KEYCLOAK_ADMIN_CLIENT_SECRET")
+# CALLBACK_URI = os.getenv("CALLBACK_URI") # where keycloak should be redirected
+
+

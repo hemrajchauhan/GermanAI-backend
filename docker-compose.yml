@@ -1,4 +1,4 @@
-services:
+services: 
   backend:
     build: .
     container_name: germanai-backend
@@ -8,15 +8,25 @@ services:
       LANGUAGETOOL_API: http://languagetool:8010/v2/check
       TRANSLATE_API: http://libretranslate:5000/translate
       ALLOWED_ORIGINS: "http://localhost:8080,http://10.0.2.2:8080"
-      # Keycloak integration variables:
-      KEYCLOAK_URL: http://localhost:8082
-      KEYCLOAK_REALM: GermanAI
-      KEYCLOAK_CLIENT_ID: vokabelmeister-app
-      # KEYCLOAK_CLIENT_SECRET: your_secret_if_needed
+
+      # Keycloak integration variables (for JWT validation only):
+      KEYCLOAK_URL_INTERNAL: ${KEYCLOAK_URL_INTERNAL}
+      KEYCLOAK_URL_PUBLIC: ${KEYCLOAK_URL_PUBLIC}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+
+      # --- Not needed for JWT validation, kept for reference to restore full OAuth2 flow or admin automation ---
+      # KEYCLOAK_ADMIN_CLIENT_SECRET: None
+      # CALLBACK_URI: vokabelmeister://callback
+
+      # Ollama integration:
+      OLLAMA_URL: http://ollama:11434/api/generate
     depends_on:
       - languagetool
       - libretranslate
       - keycloak
+      - ollama
     restart: unless-stopped
 
   languagetool:
@@ -33,18 +43,43 @@ services:
     image: libretranslate/libretranslate
     container_name: libretranslate
     ports:
-      - "5000:5000" # Host 5000 -> container 5000 (for browser/API testing)
+      - "5000:5000"
     environment:
       - LT_HOST=0.0.0.0
     restart: unless-stopped
 
   keycloak:
-    image: quay.io/keycloak/keycloak:24.0.2
+    image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
     command: start-dev
     environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=adminpassword123
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
     ports:
-      - "8082:8080" # Host 8082 -> container 8080 (for browser/API testing)
+      - "8082:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data  # This is important!
     restart: unless-stopped
+
+  # Ollama model pull init service: pulls llama3 once at startup
+  ollama-init:
+    image: ollama/ollama
+    command: pull llama3
+    volumes:
+      - ollama_data:/root/.ollama
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    command: serve
+    restart: unless-stopped
+    depends_on:
+      - ollama-init
+
+volumes:
+  ollama_data:
+  keycloak_data:

@@ -1,9 +1,12 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from app.auth.keycloak import verify_jwt_token
 from app.models.translate import TranslateRequest
 from app.config import TRANSLATE_API
 import requests
 
-router = APIRouter()
+router = APIRouter(
+    dependencies=[Depends(verify_jwt_token)]
+)
 
 @router.post("/translate-word")
 async def translate_word(request: TranslateRequest):
