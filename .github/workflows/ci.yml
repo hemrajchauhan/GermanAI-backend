@@ -1,4 +1,4 @@
-name: CI & Docker Image Publish
+name: CI
 
 on:
   push:
@@ -7,15 +7,16 @@ on:
     branches: [ "main", "dev" ]
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -34,12 +35,12 @@ jobs:
           push: true
           tags: |
             ghcr.io/hemrajchauhan/germanai-backend:latest
-            # Optionally, tag with branch
             ghcr.io/hemrajchauhan/germanai-backend:${{ github.ref_name }}
 
-      # Optional: Run tests
-      # - name: Run backend container and tests
+      # Uncomment and customize this block for integration tests!
+      # - name: Run tests
       #   run: |
-      #     docker compose up -d backend
-      #     # pytest or curl health check here
+      #     docker compose up -d
+      #     sleep 15
+      #     # pytest or other test commands
       #     docker compose down
