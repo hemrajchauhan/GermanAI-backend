@@ -1,21 +1,20 @@
-import os
 import requests
 import random
-
-OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434/api/generate")
+from app.config import OLLAMA_URL
 
 def generate_sentence(word: str, model: str = "llama3") -> str:
     """
     Generate a German example sentence with the provided word.
     """
-    prompt = f"Generate a German example sentence with the word '{word}'."
+    prompt = f"Erzeuge einen deutschen Beispielsatz mit dem Wort '{word}'."
     payload = {
         "model": model,
         "prompt": prompt,
-        "options": {"num_predict": 25}
+        "stream": False,
+        "options": {"num_predict": 150}
     }
     try:
-        response = requests.post(OLLAMA_URL, json=payload, timeout=15)
+        response = requests.post(OLLAMA_URL, json=payload, timeout=60)
         response.raise_for_status()
         data = response.json()
         return data.get("response", "").strip() or "No response from the language model."
@@ -26,24 +25,23 @@ def generate_sentence(word: str, model: str = "llama3") -> str:
     except Exception as e:
         return f"An unexpected error occurred: {str(e)}"
 
-
 def get_verb_form(verb: str, form: str, person: str = "ich", model: str = "llama3") -> str:
     """
     Generate a specific verb form for a given German verb and person.
     """
     prompts = {
-        "infinitiv": f"Give the infinitive form of the verb '{verb}'.",
-        "praesens": f"Conjugate the verb '{verb}' in present tense (Präsens) for '{person}'.",
-        "praeteritum": f"Conjugate the verb '{verb}' in simple past (Präteritum) for '{person}'.",
-        "perfekt": f"Conjugate the verb '{verb}' in present perfect (Perfekt) for '{person}'.",
-        "plusquamperfekt": f"Conjugate the verb '{verb}' in past perfect (Plusquamperfekt) for '{person}'.",
-        "futur1": f"Conjugate the verb '{verb}' in future I (Futur I) for '{person}'.",
-        "futur2": f"Conjugate the verb '{verb}' in future II (Futur II) for '{person}'.",
-        "konjunktiv1": f"Conjugate the verb '{verb}' in subjunctive I (Konjunktiv I) for '{person}'.",
-        "konjunktiv2": f"Conjugate the verb '{verb}' in subjunctive II (Konjunktiv II) for '{person}'.",
-        "imperativ": f"Give the imperative form of the verb '{verb}' for '{person}'.",
-        "partizip1": f"Give the present participle (Partizip I) of the verb '{verb}'.",
-        "partizip2": f"Give the past participle (Partizip II) of the verb '{verb}'.",
+        "infinitiv": f"Gib die Infinitivform des Verbs '{verb}'.",
+        "praesens": f"Konjugiere das Verb '{verb}' im Präsens für '{person}'.",
+        "praeteritum": f"Konjugiere das Verb '{verb}' im Präteritum für '{person}'.",
+        "perfekt": f"Konjugiere das Verb '{verb}' im Perfekt für '{person}'.",
+        "plusquamperfekt": f"Konjugiere das Verb '{verb}' im Plusquamperfekt für '{person}'.",
+        "futur1": f"Konjugiere das Verb '{verb}' im Futur I für '{person}'.",
+        "futur2": f"Konjugiere das Verb '{verb}' im Futur II für '{person}'.",
+        "konjunktiv1": f"Konjugiere das Verb '{verb}' im Konjunktiv I für '{person}'.",
+        "konjunktiv2": f"Konjugiere das Verb '{verb}' im Konjunktiv II für '{person}'.",
+        "imperativ": f"Gib die Imperativform des Verbs '{verb}' für '{person}'.",
+        "partizip1": f"Gib das Partizip I (Partizip Präsens) des Verbs '{verb}'.",
+        "partizip2": f"Gib das Partizip II (Partizip Perfekt) des Verbs '{verb}'.",
     }
     prompt = prompts.get(form.lower())
     if not prompt:
@@ -52,10 +50,11 @@ def get_verb_form(verb: str, form: str, person: str = "ich", model: str = "llama
     payload = {
         "model": model,
         "prompt": prompt,
-        "options": {"num_predict": 16}
+        "stream": False,
+        "options": {"num_predict": 100}
     }
     try:
-        response = requests.post(OLLAMA_URL, json=payload, timeout=15)
+        response = requests.post(OLLAMA_URL, json=payload, timeout=60)
         response.raise_for_status()
         data = response.json()
         return data.get("response", "").strip() or "No response from the language model."
@@ -66,25 +65,26 @@ def get_verb_form(verb: str, form: str, person: str = "ich", model: str = "llama
     except Exception as e:
         return f"An unexpected error occurred: {str(e)}"
 
-
 def generate_mcq_meaning(word: str, model: str = "llama3") -> dict:
     """
     Generates a multiple-choice question (MCQ) for the meaning of a German word (verb, noun, etc.).
     Returns a dict with the options (shuffled) and the index of the correct answer.
     """
     prompt = (
-        f"Generate a multiple-choice question for a German learner. "
-        f"The word is '{word}'. "
-        f"Provide four English options for the meaning, exactly one of which is correct and three are plausible distractors. "
-        f"Format your answer as a JSON with keys: 'options' (a list of four options) and 'answer' (the index of the correct one, 0-based)."
+    f"Erstelle eine Multiple-Choice-Frage für das deutsche Wort '{word}'. "
+    f"Gib vier Antwortmöglichkeiten auf Englisch für die Bedeutung dieses Wortes an. "
+    f"Jede Antwortmöglichkeit soll nur ein einzelnes englisches Wort oder eine sehr kurze Phrase sein, KEINE Beispielsätze. "
+    f"Nur eine Antwort ist korrekt, die anderen drei sind plausible Ablenker. "
+    f"Formatiere die Antwort als JSON mit den Schlüsseln: 'options' (eine Liste von vier Optionen) und 'answer' (der Index der richtigen Option, beginnend bei 0)."
     )
     payload = {
         "model": model,
         "prompt": prompt,
+        "stream": False,
         "options": {"num_predict": 150}
     }
     try:
-        response = requests.post(OLLAMA_URL, json=payload, timeout=25)
+        response = requests.post(OLLAMA_URL, json=payload, timeout=60)
         response.raise_for_status()
         data = response.json()
         answer_text = data.get("response", "").strip()

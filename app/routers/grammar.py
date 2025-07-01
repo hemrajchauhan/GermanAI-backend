@@ -4,6 +4,7 @@ from app.auth.keycloak import verify_jwt_token
 from app.models.grammar import GrammarRequest
 from app.config import LANGUAGETOOL_API
 from app.models.verb_form_enum import VerbForm
+from app.models.person_enum import Person
 from app.services.llm_service import generate_sentence, get_verb_form, generate_mcq_meaning
 
 router = APIRouter(
@@ -43,11 +44,11 @@ def example_sentence(
 
 @router.get("/verb-form/")
 def verb_form(
-    verb: str = Query(..., description="German verb in Infinitive (e.g., gehen)"),
+    verb: str = Query(..., description="German verb in any form (e.g., gehen)"),
     form: VerbForm = Query(..., description="Verb form"),
-    person: str = Query("ich", description="Person for conjugation (e.g., ich, du, wir, etc.)")
+    person: Person = Query(Person.ich, description="Person for conjugation (ich, du, er/sie/es, wir, ihr, sie/Sie)")
 ):
-    result = get_verb_form(verb, form.value, person)
+    result = get_verb_form(verb, form.value, person.value)
 
     # Error handling for get_verb_form
     if result.startswith("Unknown or unsupported verb form."):
@@ -62,7 +63,7 @@ def verb_form(
         raise HTTPException(status_code=500, detail=result)
 
     # Normal case
-    return {"verb": verb, "form": form.value, "person": person, "result": result}
+    return {"verb": verb, "form": form.value, "person": person.value, "result": result}
 
 
 @router.get("/mcq-meaning/")
