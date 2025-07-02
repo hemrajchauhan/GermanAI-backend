@@ -2,17 +2,6 @@ from pydantic import BaseModel
 from typing import List, Optional
 from enum import Enum
 
-class DictionaryMeaningResponse(BaseModel):
-    word: str
-    meanings: List[str]
-    error: Optional[str] = None
-
-class NounInfoResponse(BaseModel):
-    noun: str
-    gender: Optional[str] = None  # "der", "die", "das", or None
-    plural: Optional[str] = None  # plural form or None
-    error: Optional[str] = None   # error if any
-
 class SubLemma(BaseModel):
     lemma: str
     hidx: Optional[str] = None
