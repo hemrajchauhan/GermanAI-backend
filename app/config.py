@@ -1,6 +1,7 @@
 import os
 
 # Declare this in .env file
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "")
 LANGUAGETOOL_API = os.getenv("LANGUAGETOOL_API")
 OLLAMA_URL = os.getenv("OLLAMA_URL")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")

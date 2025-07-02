@@ -1,4 +1,4 @@
-services: 
+services:
   backend:
     build: .
     container_name: germanai-backend
@@ -6,7 +6,6 @@ services:
       - "8080:8080"
     environment:
       LANGUAGETOOL_API: http://languagetool:8010/v2/check
-      TRANSLATE_API: http://libretranslate:5000/translate
       ALLOWED_ORIGINS: "http://localhost:8080,http://10.0.2.2:8080"
 
       # Keycloak integration variables (for JWT validation only):
@@ -19,15 +18,13 @@ services:
       # --- Not needed for JWT validation, kept for reference to restore full OAuth2 flow or admin automation ---
       # KEYCLOAK_ADMIN_CLIENT_SECRET: None
       # CALLBACK_URI: vokabelmeister://callback
-
-      # Ollama integration:
-      OLLAMA_URL: http://ollama:11434/api/generate
-      OLLAMA_MODEL: ${OLLAMA_MODEL}
+      HUGGINGFACE_HUB_TOKEN: ${HUGGINGFACE_HUB_TOKEN}
     depends_on:
       - languagetool
       - keycloak
-      - ollama
     restart: unless-stopped
+    volumes:
+      - hf_cache:/root/.cache/huggingface
 
   languagetool:
     image: silviof/docker-languagetool:latest
@@ -49,28 +46,9 @@ services:
     ports:
       - "8082:8080" # Host 8082 -> container 8080 (for browser/API testing)
     volumes:
-      - keycloak_data:/opt/keycloak/data  # This is important!
+      - keycloak_data:/opt/keycloak/data
     restart: unless-stopped
-
-  # Ollama model pull init service: pulls llama3 once at startup
-  ollama-init:
-    image: ollama/ollama
-    command: pull ${OLLAMA_MODEL}
-    volumes:
-      - ollama_data:/root/.ollama
-
-  ollama:
-    image: ollama/ollama
-    container_name: ollama
-    ports:
-      - "11434:11434" # Host 11434 -> container 11434 (for browser/API testing)
-    volumes:
-      - ollama_data:/root/.ollama
-    command: serve
-    restart: unless-stopped
-    depends_on:
-      - ollama-init
 
 volumes:
-  ollama_data:
   keycloak_data:
+  hf_cache:

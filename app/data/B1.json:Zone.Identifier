@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+ReferrerUrl=https://www.dwds.de/d/api
+HostUrl=https://www.dwds.de/api/lemma/goethe/B1.json
