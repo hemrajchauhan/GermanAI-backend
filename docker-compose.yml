@@ -1,4 +1,13 @@
 services:
+  model-downloader:
+      image: python:3.11-slim
+      command: ["bash", "/app/download_model.sh"]
+      environment:
+        HUGGINGFACE_HUB_TOKEN: ${HUGGINGFACE_HUB_TOKEN}
+      volumes:
+        - ./download_model.sh:/app/download_model.sh:ro
+        - hf_cache:/root/.cache/huggingface
+      restart: "no"
   backend:
     build: .
     container_name: germanai-backend
@@ -19,7 +28,10 @@ services:
       # KEYCLOAK_ADMIN_CLIENT_SECRET: None
       # CALLBACK_URI: vokabelmeister://callback
       HUGGINGFACE_HUB_TOKEN: ${HUGGINGFACE_HUB_TOKEN}
+      # LLAMA_GGUF_PATH: ${LLAMA_GGUF_PATH}
+      # TRANSFORMERS_MODEL_NAME: ${TRANSFORMERS_MODEL_NAME}
     depends_on:
+      - model-downloader
       - languagetool
       - keycloak
     restart: unless-stopped

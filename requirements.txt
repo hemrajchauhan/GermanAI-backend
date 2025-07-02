@@ -42,12 +42,13 @@ wiktionaryparser==0.0.97
 beautifulsoup4==4.13.4
 
 # --- LLM: Hugging Face and Torch ---
-transformers==4.53.0
-sentencepiece==0.2.0
+transformers>=4.53.0
+sentencepiece>=0.2.0
+sacremoses>=0.1.1
 llama-cpp-python>=0.3.9
 # Use only one of the following for torch:
-torch==2.7.1 --index-url https://download.pytorch.org/whl/cu124   # GPU (your dev/test machine)
-# torch==2.7.1 --index-url https://download.pytorch.org/whl/cpu     # For production/CPU
+torch>=2.7.1 --index-url https://download.pytorch.org/whl/cu124   # GPU (your dev/test machine)
+# torch>=2.7.1 --index-url https://download.pytorch.org/whl/cpu     # For production/CPU
 
 # Optionally, if you use Jupyter or run in notebooks:
 # ipython==8.25.0
