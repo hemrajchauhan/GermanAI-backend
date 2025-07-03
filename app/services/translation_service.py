@@ -34,7 +34,7 @@ def translate_word(request: WordTranslationRequest) -> TranslationResponse:
     except Exception as e:
         return TranslationResponse(source=word, error=f"Translation error: {str(e)}")
 
-def translate_sentence(request: SentenceTranslationRequest, max_words: int = 50) -> TranslationResponse:
+def translate_sentence(request: SentenceTranslationRequest, max_words: int = 100) -> TranslationResponse:
     """
     Translate a German sentence to English (with a word limit for resource control).
     """

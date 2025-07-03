@@ -22,7 +22,7 @@ def generate_sentence(request: ExampleSentenceRequest) -> ExampleSentenceRespons
 
     # Detect if engine needs a chat message or plain prompt
     is_chat = getattr(engine, "is_chat", False)
-    task = f"Gib mir einen sinnvollen deutschen Beispielsatz mit dem Wort '{word}'."
+    task = f"Erzeuge einen deutschen Beispielsatz mit dem Wort '{word}'."
     prompt = _llama_chat_prompt(task) if is_chat else f"Beispielsatz mit '{word}':"
 
     try:

@@ -8,7 +8,7 @@ from app.models.germangpt import (
     Person,
 )
 from app.models.common import ErrorResponse
-from app.services.germangpt_service import generate_sentence, get_verb_form
+from app.services.llm_service import generate_sentence, get_verb_form
 
 router = APIRouter()
 

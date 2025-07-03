@@ -9,7 +9,7 @@ LANGUAGETOOL_API = os.getenv("LANGUAGETOOL_API")
 #Hugging Face Settings
 LLAMA_GGUF_PATH = os.getenv("LLAMA_GGUF_PATH", "/root/.cache/huggingface/hub/models--google--gemma-3-4b-it-qat-q4_0-gguf/blobs/76aed0a8285b83102f18b5d60e53c70d09eb4e9917a20ce8956bd546452b56e2")
 # Transformers model (for HuggingFace pipeline)
-TRANSFORMERS_MODEL_NAME = os.getenv("TRANSFORMERS_MODEL_NAME", "microsoft/Phi-4-mini-instruct")
+TRANSFORMERS_MODEL_NAME = os.getenv("TRANSFORMERS_MODEL_NAME", "meta-llama/Llama-3.2-3B-Instruct")
 TRANSFORMERS_MAX_LENGTH = int(os.getenv("TRANSFORMERS_MAX_LENGTH", 150))
 # Llama context size and thread settings (adjust as needed for your hardware)
 LLAMA_N_CTX = int(os.getenv("LLAMA_N_CTX", 2048))

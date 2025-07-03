@@ -5,7 +5,7 @@ from app.routers.grammar.grammar_router import router as grammar_router
 from app.routers.translation.translation_router import router as translation_router
 from app.routers.wordfreq.wordfreq_router import router as most_used_router
 from app.routers.protected.keycloak_router import router as keycloak_router
-from app.routers.llm.germangpt_router import router as germangpt_router
+from app.routers.llm.llm_router import router as germangpt_router
 from app.routers.vocab.dwds_vocab_router import router as dwds_vocab_router
 
 app = FastAPI(
@@ -29,7 +29,7 @@ app.include_router(grammar_router, prefix="/api/grammar", tags=["Grammar"])
 app.include_router(translation_router, prefix="/api/translation", tags=["Translation"])
 app.include_router(most_used_router, prefix="/api/wordfreq", tags=["Most Used Words"])
 app.include_router(dwds_vocab_router, prefix="/api/dwds", tags=["DWDS Vocabulary"])
-app.include_router(germangpt_router, prefix="/api/llm/germangpt", tags=["GermanGPT"])
+app.include_router(germangpt_router, prefix="/api/llm/germangpt", tags=["LLM"])
 app.include_router(keycloak_router, prefix="/api/protected", tags=["Keycloak"])
 
 @app.get("/")
